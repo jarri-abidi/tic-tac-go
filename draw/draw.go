@@ -12,6 +12,10 @@ func v(x, y float64) vector {
 	return pixel.V(x, y)
 }
 
+// Draws tic-tac-toe board of squares where 
+// length is length of sides of squares,
+// thickness is thickness of lines on board
+// and lineColor is color of lines on board 
 func Board(imd *imdraw.IMDraw, length, thickness float64, lineColor color.Color) {
 	imd.Color = lineColor
 	Square(imd, length, 0, 0, thickness)
@@ -25,6 +29,10 @@ func Board(imd *imdraw.IMDraw, length, thickness float64, lineColor color.Color)
 	Square(imd, length, 2*length, 2*length, thickness)
 }
 
+// Draws individual square where
+// length is the length of sides of square,
+// thickness is the thickness of border of square,
+// and x,y are the position of bottom left corner of square
 func Square(imd *imdraw.IMDraw, length, x, y, thickness float64) {
 	imd.Push(v(x, y))
 	imd.Push(v(x, y+length))
@@ -33,12 +41,22 @@ func Square(imd *imdraw.IMDraw, length, x, y, thickness float64) {
 	imd.Rectangle(thickness)
 }
 
+// Draws O (circle) mark where
+// c is center position of the circle
+// radius is the length from center of circle to its border,
+// thickness is the thickness of border of circle,
+// and color is the color of the circle
 func O(imd *imdraw.IMDraw, c vector, radius, thickness float64, color color.Color) {
 	imd.Color = color
 	imd.Push(c)
 	imd.Circle(radius, thickness)
 }
 
+// Draws X (cross) mark where
+// c is center position of the cross
+// length is the length of each diagonal in the cross,
+// thickness is the thickness of the cross,
+// and color is the color of the cross
 func X(imd *imdraw.IMDraw, c vector, length, thickness float64, color color.Color) {
 	imd.Color = color
 	l := length / 2
@@ -48,6 +66,13 @@ func X(imd *imdraw.IMDraw, c vector, length, thickness float64, color color.Colo
 	imd.Line(thickness)
 }
 
+// Draws line across marked squares (to show victory) where
+// c1 is center position of the square at one end of the line
+// c2 is center position of the square at other end of the line
+// o1 is potental offset with which to extend the line at one end
+// o2 is potental offset with which to extend the line at other end
+// thickness is the thickness of the line,
+// and color is the color of the line
 func Line(imd *imdraw.IMDraw, c1, c2, o1, o2 vector, thickness float64, color color.Color) {
 	imd.Color = color
 	if c1.X == c2.X {
