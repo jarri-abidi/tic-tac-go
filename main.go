@@ -10,11 +10,14 @@ import (
 	"fmt"
 )
 
-const stateO string = "O"
-const stateX string = "X"
-const stateEmpty string = ""
+const (
+	stateO string = "O"
+	stateX string = "X"
+	stateEmpty string = ""
+)
 
 var (
+	zv = pixel.ZV
 	squareLength = float64(170)
 	crossLength = float64(90)
 	circleRadius = float64(50)
@@ -40,7 +43,7 @@ var (
 )
 
 type vector = pixel.Vec 
-var zv = pixel.ZV
+
 func v(x, y float64) vector {
 	return pixel.V(x, y)
 }
