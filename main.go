@@ -67,7 +67,7 @@ func run() {
 	}
 
 	imd := imdraw.New(nil)
-	draw.DrawBoard(imd, squareLength, drawingThickness, squareColor)
+	draw.Board(imd, squareLength, drawingThickness, squareColor)
 	startGame()
 
 	isOTurn := true
@@ -82,11 +82,11 @@ func run() {
 			drawPosition := getNearestSquare(win.MousePosition())
 			if !gameOver && state[drawPosition] == stateEmpty {
 				if isOTurn {
-					draw.DrawO(imd, drawPosition, circleRadius, drawingThickness, circleColor)
+					draw.O(imd, drawPosition, circleRadius, drawingThickness, circleColor)
 					state[drawPosition] = stateO
 					isOTurn = false
 				} else {
-					draw.DrawX(imd, drawPosition, crossLength, drawingThickness, crossColor)
+					draw.X(imd, drawPosition, crossLength, drawingThickness, crossColor)
 					state[drawPosition] = stateX
 					isOTurn = true
 				}
@@ -102,7 +102,7 @@ func run() {
 					} else {
 						lineColor = circleColor
 					}
-					draw.DrawLine(imd, coordinates[x1][y1], coordinates[x2][y2], offsets[x1][y1], offsets[x2][y2], drawingThickness, lineColor)
+					draw.Line(imd, coordinates[x1][y1], coordinates[x2][y2], offsets[x1][y1], offsets[x2][y2], drawingThickness, lineColor)
 				}
 			}
 		}

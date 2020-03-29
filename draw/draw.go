@@ -12,20 +12,20 @@ func v(x, y float64) vector {
 	return pixel.V(x, y)
 }
 
-func DrawBoard(imd *imdraw.IMDraw, length, thickness float64, lineColor color.Color) {
+func Board(imd *imdraw.IMDraw, length, thickness float64, lineColor color.Color) {
 	imd.Color = lineColor
-	DrawSquare(imd, length, 0, 0, thickness)
-	DrawSquare(imd, length, 0, length, thickness)
-	DrawSquare(imd, length, 0, 2*length, thickness)
-	DrawSquare(imd, length, length, 0, thickness)
-	DrawSquare(imd, length, length, length, thickness)
-	DrawSquare(imd, length, length, 2*length, thickness)
-	DrawSquare(imd, length, 2*length, 0, thickness)
-	DrawSquare(imd, length, 2*length, length, thickness)
-	DrawSquare(imd, length, 2*length, 2*length, thickness)
+	Square(imd, length, 0, 0, thickness)
+	Square(imd, length, 0, length, thickness)
+	Square(imd, length, 0, 2*length, thickness)
+	Square(imd, length, length, 0, thickness)
+	Square(imd, length, length, length, thickness)
+	Square(imd, length, length, 2*length, thickness)
+	Square(imd, length, 2*length, 0, thickness)
+	Square(imd, length, 2*length, length, thickness)
+	Square(imd, length, 2*length, 2*length, thickness)
 }
 
-func DrawSquare(imd *imdraw.IMDraw, length, x, y, thickness float64) {
+func Square(imd *imdraw.IMDraw, length, x, y, thickness float64) {
 	imd.Push(v(x, y))
 	imd.Push(v(x, y+length))
 	imd.Push(v(x+length, y))
@@ -33,13 +33,13 @@ func DrawSquare(imd *imdraw.IMDraw, length, x, y, thickness float64) {
 	imd.Rectangle(thickness)
 }
 
-func DrawO(imd *imdraw.IMDraw, c vector, radius, thickness float64, color color.Color) {
+func O(imd *imdraw.IMDraw, c vector, radius, thickness float64, color color.Color) {
 	imd.Color = color
 	imd.Push(c)
 	imd.Circle(radius, thickness)
 }
 
-func DrawX(imd *imdraw.IMDraw, c vector, length, thickness float64, color color.Color) {
+func X(imd *imdraw.IMDraw, c vector, length, thickness float64, color color.Color) {
 	imd.Color = color
 	l := length / 2
 	imd.Push(v(c.X-l, c.Y-l), v(c.X+l, c.Y+l))
@@ -48,7 +48,7 @@ func DrawX(imd *imdraw.IMDraw, c vector, length, thickness float64, color color.
 	imd.Line(thickness)
 }
 
-func DrawLine(imd *imdraw.IMDraw, c1, c2, o1, o2 vector, thickness float64, color color.Color) {
+func Line(imd *imdraw.IMDraw, c1, c2, o1, o2 vector, thickness float64, color color.Color) {
 	imd.Color = color
 	if c1.X == c2.X {
 		imd.Push(c1.Add(v(0, o1.Y)), c2.Add(v(0, o2.Y)))
