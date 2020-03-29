@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/JarriAbidi/tictacgo/draw"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -66,7 +67,8 @@ func run() {
 	}
 
 	imd := imdraw.New(nil)
-	drawBoard(imd, squareLength, drawingThickness, squareColor)
+	draw.DrawBoard(imd, squareLength, drawingThickness, squareColor)
+	startGame()
 
 	isOTurn := true
 	gameOver := false
@@ -80,11 +82,11 @@ func run() {
 			drawPosition := getNearestSquare(win.MousePosition())
 			if !gameOver && state[drawPosition] == stateEmpty {
 				if isOTurn {
-					drawO(imd, drawPosition, circleRadius, drawingThickness, circleColor)
+					draw.DrawO(imd, drawPosition, circleRadius, drawingThickness, circleColor)
 					state[drawPosition] = stateO
 					isOTurn = false
 				} else {
-					drawX(imd, drawPosition, crossLength, drawingThickness, crossColor)
+					draw.DrawX(imd, drawPosition, crossLength, drawingThickness, crossColor)
 					state[drawPosition] = stateX
 					isOTurn = true
 				}
@@ -100,11 +102,19 @@ func run() {
 					} else {
 						lineColor = circleColor
 					}
-					drawLine(imd, coordinates[x1][y1], coordinates[x2][y2], offsets[x1][y1], offsets[x2][y2], drawingThickness, lineColor)
+					draw.DrawLine(imd, coordinates[x1][y1], coordinates[x2][y2], offsets[x1][y1], offsets[x2][y2], drawingThickness, lineColor)
 				}
 			}
 		}
 		win.Update()
+	}
+}
+
+func startGame() {
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			state[coordinates[i][j]] = stateEmpty
+		}
 	}
 }
 
