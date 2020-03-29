@@ -1,4 +1,4 @@
-module tictacgo
+module github.com/JarriAbidi/tictacgo
 
 go 1.14
 
