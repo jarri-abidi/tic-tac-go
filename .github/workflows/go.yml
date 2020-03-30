@@ -23,7 +23,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Install Dependencies
-      run: apt-get install -y libgl1-mesa-dev && apt-get install -y xorg-dev
+      run: sudo apt-get install -y libgl1-mesa-dev && sudo apt-get install -y xorg-dev
 
     - name: Build
       run: go build -v .
