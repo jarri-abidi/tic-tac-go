@@ -123,7 +123,7 @@ func processClick(imd *imdraw.IMDraw, board [][]square, clickedSquare *square) {
 		}
 		if over, winner, s1, s2 = checkWinner(board); over {
 			fmt.Printf("The winner is %s!\n", winner)
-			c := color.Color(nil)
+			var c color.Color 
 			if winner == O {
 				c = circleColor
 			} else {
