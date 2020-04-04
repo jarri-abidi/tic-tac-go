@@ -49,6 +49,11 @@ func TestCheckVerticalWin(t *testing.T) {
 			{square{state: ""}, square{state: ""}, square{state: ""}},
 			{square{state: ""}, square{state: ""}, square{state: ""}},
 		}, false, "", square{state: ""}, square{state: ""}},
+		{"No win on tie", [][]square{
+			{square{state: o}, square{state: o}, square{state: x}},
+			{square{state: x}, square{state: x}, square{state: o}},
+			{square{state: o}, square{state: x}, square{state: o}},
+		}, false, "", square{state: ""}, square{state: ""}},
 	}
 	for _, testCase := range testTable {
 		t.Run(testCase.Name, func(t *testing.T) {
@@ -105,6 +110,11 @@ func TestCheckHorizontalWin(t *testing.T) {
 			{square{state: ""}, square{state: ""}, square{state: ""}},
 			{square{state: ""}, square{state: ""}, square{state: ""}},
 			{square{state: ""}, square{state: ""}, square{state: ""}},
+		}, false, "", square{state: ""}, square{state: ""}},
+		{"No win on tie", [][]square{
+			{square{state: o}, square{state: o}, square{state: x}},
+			{square{state: x}, square{state: x}, square{state: o}},
+			{square{state: o}, square{state: x}, square{state: o}},
 		}, false, "", square{state: ""}, square{state: ""}},
 	}
 	for _, testCase := range testTable {
