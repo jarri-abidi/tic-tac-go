@@ -13,7 +13,7 @@ type testCase struct {
 }
 
 func TestCheckVerticalWin(t *testing.T) {
-	testTable := []testCase {
+	testTable := []testCase{
 		{"O win on right", [][]square{
 			{square{state: O}, square{state: O}, square{state: O}},
 			{square{state: X}, square{state: X}, square{state: ""}},
@@ -70,7 +70,7 @@ func TestCheckVerticalWin(t *testing.T) {
 }
 
 func TestCheckHorizontalWin(t *testing.T) {
-	testTable := []testCase {
+	testTable := []testCase{
 		{"O win on top", [][]square{
 			{square{state: O}, square{state: ""}, square{state: O}},
 			{square{state: X}, square{state: X}, square{state: O}},
