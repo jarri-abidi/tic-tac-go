@@ -45,6 +45,16 @@ var (
 
 type vector = pixel.Vec
 
+type square struct {
+	center vector
+	corner vector
+	state  string
+}
+
+func (s *square) string() string {
+	return fmt.Sprintf("center: %s, corner: %s, state: %s", s.center.String(), s.corner.String(), s.state)
+}
+
 func v(x, y float64) vector {
 	return pixel.V(x, y)
 }
