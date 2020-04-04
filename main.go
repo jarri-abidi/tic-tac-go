@@ -12,35 +12,28 @@ import (
 )
 
 const (
-	stateO     string = "O"
-	stateX     string = "X"
-	stateEmpty string = ""
+	O            = "O"
+	X            = "X"
+	boardLength  = float64(600)
+	squareLength = boardLength / 3
+	thickness    = boardLength / 60
+	crossLength  = squareLength / 2
+	circleRadius = squareLength * 3 / 10
+	lineOffset   = squareLength * 2 / 5
+	firstOffset  = squareLength / 2
+	secondOffset = squareLength * 3 / 2
+	thirdOffset  = squareLength * 5 / 2
 )
 
 var (
-	zv               = pixel.ZV
-	squareLength     = float64(170)
-	crossLength      = float64(90)
-	circleRadius     = float64(50)
-	drawingThickness = float64(10)
-	squareColor      = colornames.Black
-	circleColor      = colornames.Red
-	crossColor       = colornames.Blue
-	lineOffset       = squareLength / 3
-	first            = squareLength / 2
-	second           = (squareLength / 2) * 3
-	third            = (squareLength / 2) * 5
-	coordinates      = [][]vector{
-		{v(first, first), v(first, second), v(first, third)},
-		{v(second, first), v(second, second), v(second, third)},
-		{v(third, first), v(third, second), v(third, third)},
-	}
-	offsets = [][]vector{
-		{v(-lineOffset, -lineOffset), v(-lineOffset, 0), v(-lineOffset, lineOffset)},
-		{v(0, -lineOffset), v(0, 0), v(0, lineOffset)},
-		{v(lineOffset, -lineOffset), v(lineOffset, 0), v(lineOffset, lineOffset)},
-	}
-	state = make(map[vector]string)
+	zv          = pixel.ZV
+	zs          = square{center: zv, corner: zv, state: ""}
+	squareColor = colornames.Black
+	circleColor = colornames.Red
+	crossColor  = colornames.Blue
+	over        bool
+	turn        string
+	winner      string
 )
 
 type vector = pixel.Vec
@@ -64,10 +57,9 @@ func main() {
 }
 
 func run() {
-	// all of our code will be fired up from here
 	cfg := pixelgl.WindowConfig{
 		Title:  "Tic Tac Go",
-		Bounds: pixel.R(0, 0, squareLength*3, squareLength*3),
+		Bounds: pixel.R(0, 0, boardLength, boardLength),
 		VSync:  true,
 	}
 
@@ -77,161 +69,171 @@ func run() {
 	}
 
 	imd := imdraw.New(nil)
-	draw.Board(imd, squareLength, drawingThickness, squareColor)
-	startGame()
+	board := newGame(imd, O)
 
-	isOTurn := true
-	gameOver := false
-	winner := ""
-	v1 := zv
-	v2 := zv
 	for !win.Closed() {
 		win.Clear(colornames.White)
 		imd.Draw(win)
 		if win.JustPressed(pixelgl.MouseButtonLeft) {
-			drawPosition := getNearestSquare(win.MousePosition())
-			if !gameOver && state[drawPosition] == stateEmpty {
-				if isOTurn {
-					draw.O(imd, drawPosition, circleRadius, drawingThickness, circleColor)
-					state[drawPosition] = stateO
-					isOTurn = false
-				} else {
-					draw.X(imd, drawPosition, crossLength, drawingThickness, crossColor)
-					state[drawPosition] = stateX
-					isOTurn = true
-				}
-				if gameOver, winner, v1, v2 = checkWinner(); gameOver {
-					fmt.Printf("The winner is %s!\n", winner)
-					x1 := int(v1.X)
-					x2 := int(v2.X)
-					y1 := int(v1.Y)
-					y2 := int(v2.Y)
-					var lineColor color.Color
-					if isOTurn {
-						lineColor = crossColor
-					} else {
-						lineColor = circleColor
-					}
-					draw.Line(imd, coordinates[x1][y1], coordinates[x2][y2], offsets[x1][y1], offsets[x2][y2], drawingThickness, lineColor)
-				}
-			}
+			processClick(imd, board, getNearestSquare(board, win.MousePosition()))
 		}
 		win.Update()
 	}
 }
 
-func startGame() {
+func newGame(imd *imdraw.IMDraw, firstTurn string) [][]square {
+	go draw.Board(imd, squareLength, thickness, squareColor)
+	turn = firstTurn
+	over = false
+	winner = ""
+	board := [][]square{
+		{
+			{center: v(firstOffset, firstOffset), corner: v(-lineOffset, -lineOffset)},
+			{center: v(firstOffset, secondOffset), corner: v(-lineOffset, 0)},
+			{center: v(firstOffset, thirdOffset), corner: v(-lineOffset, lineOffset)},
+		}, {
+			{center: v(secondOffset, firstOffset), corner: v(0, -lineOffset)},
+			{center: v(secondOffset, secondOffset), corner: v(0, 0)},
+			{center: v(secondOffset, thirdOffset), corner: v(0, lineOffset)},
+		}, {
+			{center: v(thirdOffset, firstOffset), corner: v(lineOffset, -lineOffset)},
+			{center: v(thirdOffset, secondOffset), corner: v(lineOffset, 0)},
+			{center: v(thirdOffset, thirdOffset), corner: v(lineOffset, lineOffset)},
+		},
+	}
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
-			state[coordinates[i][j]] = stateEmpty
+			board[i][j].state = ""
+		}
+	}
+	return board
+}
+
+func processClick(imd *imdraw.IMDraw, board [][]square, clickedSquare *square) {
+	var s1, s2 square
+	if !over && clickedSquare.state == "" {
+		if turn == O {
+			draw.O(imd, clickedSquare.center, circleRadius, thickness, circleColor)
+			clickedSquare.state = O
+			turn = X
+		} else if turn == X {
+			draw.X(imd, clickedSquare.center, crossLength, thickness, crossColor)
+			clickedSquare.state = X
+			turn = O
+		}
+		if over, winner, s1, s2 = checkWinner(board); over {
+			fmt.Printf("The winner is %s!\n", winner)
+			c := color.Color(nil)
+			if winner == O {
+				c = circleColor
+			} else {
+				c = crossColor
+			}
+			draw.Line(imd, s1.center, s2.center, s1.corner, s2.corner, thickness, c)
 		}
 	}
 }
 
-func getNearestSquare(click vector) vector {
+func getNearestSquare(board [][]square, click vector) *square {
 	minDistance := math.MaxFloat64
-	var nearestX float64
-	var nearestY float64
+	var nearest *square
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
-			square := coordinates[i][j]
-			result := click.Sub(square)
+			square := &board[i][j]
+			result := click.Sub(square.center)
 			diff := math.Abs(result.X) + math.Abs(result.Y)
 			if minDistance > diff {
 				minDistance = diff
-				nearestX = square.X
-				nearestY = square.Y
+				nearest = square
 			}
 		}
 	}
-	return v(nearestX, nearestY)
+	return nearest
 }
 
-func checkWinner() (bool, string, vector, vector) {
-	// check horizontal win
-	if gameOver, winner := checkHorizontalWin(1, 2); gameOver {
-		return true, winner, v(0, 2), v(2, 2)
+func checkWinner(board [][]square) (bool, string, square, square) {
+	if over, winner, s1, s2 := checkVerticalWin(board); over {
+		return true, winner, s1, s2
 	}
-	if gameOver, winner := checkHorizontalWin(1, 1); gameOver {
-		return true, winner, v(0, 1), v(2, 1)
+	if over, winner, s1, s2 := checkHorizontalWin(board); over {
+		return true, winner, s1, s2
 	}
-	if gameOver, winner := checkHorizontalWin(1, 0); gameOver {
-		return true, winner, v(0, 0), v(2, 0)
+	if over, winner, s1, s2 := checkDiagonalWin(board); over {
+		return true, winner, s1, s2
 	}
-	// check vertical win
-	if gameOver, winner := checkVerticalWin(0, 1); gameOver {
-		return true, winner, v(0, 0), v(0, 2)
-	}
-	if gameOver, winner := checkVerticalWin(1, 1); gameOver {
-		return true, winner, v(1, 0), v(1, 2)
-	}
-	if gameOver, winner := checkVerticalWin(2, 1); gameOver {
-		return true, winner, v(2, 0), v(2, 2)
-	}
-	// check diagonal win
-	if gameOver, winner, v1, v2 := checkDiagonalWin(1, 1); gameOver {
-		return true, winner, v1, v2
-	}
-	return false, "", zv, zv
+	return false, "", zs, zs
 }
 
-func checkHorizontalWin(i, j int) (bool, string) {
-	if state[coordinates[i][j]] == stateEmpty {
-		return false, ""
+func checkHorizontalWin(board [][]square) (bool, string, square, square) {
+	i := 1
+	j := 2
+	for j >= 0 {
+		if board[i][j].state == "" {
+			j--
+			continue
+		}
+		if board[i][j].state == O &&
+			board[i-1][j].state == O &&
+			board[i+1][j].state == O {
+			return true, O, board[0][j], board[2][j]
+		}
+		if board[i][j].state == X &&
+			board[i-1][j].state == X &&
+			board[i+1][j].state == X {
+			return true, X, board[0][j], board[2][j]
+		}
+		j--
 	}
-	if state[coordinates[i][j]] == stateO &&
-		state[coordinates[i-1][j]] == stateO &&
-		state[coordinates[i+1][j]] == stateO {
-		return true, "O"
-	}
-	if state[coordinates[i][j]] == stateX &&
-		state[coordinates[i-1][j]] == stateX &&
-		state[coordinates[i+1][j]] == stateX {
-		return true, "X"
-	}
-	return false, ""
+	return false, "", zs, zs
 }
 
-func checkVerticalWin(i, j int) (bool, string) {
-	if state[coordinates[i][j]] == stateEmpty {
-		return false, ""
+func checkVerticalWin(board [][]square) (bool, string, square, square) {
+	i := 2
+	j := 1
+	for i >= 0 {
+		if board[i][j].state == "" {
+			i--
+			continue
+		}
+		if board[i][j].state == O &&
+			board[i][j-1].state == O &&
+			board[i][j+1].state == O {
+			return true, O, board[i][0], board[i][2]
+		}
+		if board[i][j].state == X &&
+			board[i][j-1].state == X &&
+			board[i][j+1].state == X {
+			return true, X, board[i][0], board[i][2]
+		}
+		i--
 	}
-	if state[coordinates[i][j]] == stateO &&
-		state[coordinates[i][j-1]] == stateO &&
-		state[coordinates[i][j+1]] == stateO {
-		return true, "O"
-	}
-	if state[coordinates[i][j]] == stateX &&
-		state[coordinates[i][j-1]] == stateX &&
-		state[coordinates[i][j+1]] == stateX {
-		return true, "X"
-	}
-	return false, ""
+	return false, "", zs, zs
 }
 
-func checkDiagonalWin(i, j int) (bool, string, vector, vector) {
-	if state[coordinates[i][j]] == stateEmpty {
-		return false, "", zv, zv
+func checkDiagonalWin(board [][]square) (bool, string, square, square) {
+	i, j := 1, 1
+	if board[i][j].state == "" {
+		return false, "", zs, zs
 	}
-	if state[coordinates[i][j]] == stateO &&
-		state[coordinates[i-1][j-1]] == stateO &&
-		state[coordinates[i+1][j+1]] == stateO {
-		return true, "O", v(float64(i-1), float64(j-1)), v(float64(i+1), float64(j+1))
+	if board[i][j].state == O &&
+		board[i-1][j-1].state == O &&
+		board[i+1][j+1].state == O {
+		return true, O, board[i-1][j-1], board[i+1][j+1]
 	}
-	if state[coordinates[i][j]] == stateO &&
-		state[coordinates[i-1][j+1]] == stateO &&
-		state[coordinates[i+1][j-1]] == stateO {
-		return true, "O", v(float64(i-1), float64(j+1)), v(float64(i+1), float64(j-1))
+	if board[i][j].state == O &&
+		board[i-1][j+1].state == O &&
+		board[i+1][j-1].state == O {
+		return true, O, board[i-1][j+1], board[i+1][j-1]
 	}
-	if state[coordinates[i][j]] == stateX &&
-		state[coordinates[i-1][j-1]] == stateX &&
-		state[coordinates[i+1][j+1]] == stateX {
-		return true, "X", v(float64(i-1), float64(j-1)), v(float64(i+1), float64(j+1))
+	if board[i][j].state == X &&
+		board[i-1][j-1].state == X &&
+		board[i+1][j+1].state == X {
+		return true, X, board[i-1][j-1], board[i+1][j+1]
 	}
-	if state[coordinates[i][j]] == stateX &&
-		state[coordinates[i-1][j+1]] == stateX &&
-		state[coordinates[i+1][j-1]] == stateX {
-		return true, "X", v(float64(i-1), float64(j+1)), v(float64(i+1), float64(j-1))
+	if board[i][j].state == X &&
+		board[i-1][j+1].state == X &&
+		board[i+1][j-1].state == X {
+		return true, X, board[i-1][j+1], board[i+1][j-1]
 	}
-	return false, "", zv, zv
+	return false, "", zs, zs
 }
