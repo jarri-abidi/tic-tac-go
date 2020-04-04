@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	O            = "O"
-	X            = "X"
+	o            = "O"
+	x            = "X"
 	boardLength  = float64(600)
 	squareLength = boardLength / 3
 	thickness    = boardLength / 60
@@ -69,7 +69,7 @@ func run() {
 	}
 
 	imd := imdraw.New(nil)
-	board := newGame(imd, O)
+	board := newGame(imd, o)
 
 	for !win.Closed() {
 		win.Clear(colornames.White)
@@ -112,19 +112,19 @@ func newGame(imd *imdraw.IMDraw, firstTurn string) [][]square {
 func processClick(imd *imdraw.IMDraw, board [][]square, clickedSquare *square) {
 	var s1, s2 square
 	if !over && clickedSquare.state == "" {
-		if turn == O {
+		if turn == o {
 			draw.O(imd, clickedSquare.center, circleRadius, thickness, circleColor)
-			clickedSquare.state = O
-			turn = X
-		} else if turn == X {
+			clickedSquare.state = o
+			turn = x
+		} else if turn == x {
 			draw.X(imd, clickedSquare.center, crossLength, thickness, crossColor)
-			clickedSquare.state = X
-			turn = O
+			clickedSquare.state = x
+			turn = o
 		}
 		if over, winner, s1, s2 = checkWinner(board); over {
 			fmt.Printf("The winner is %s!\n", winner)
-			var c color.Color 
-			if winner == O {
+			var c color.Color
+			if winner == o {
 				c = circleColor
 			} else {
 				c = crossColor
@@ -172,15 +172,15 @@ func checkHorizontalWin(board [][]square) (bool, string, square, square) {
 			j--
 			continue
 		}
-		if board[i][j].state == O &&
-			board[i-1][j].state == O &&
-			board[i+1][j].state == O {
-			return true, O, board[0][j], board[2][j]
+		if board[i][j].state == o &&
+			board[i-1][j].state == o &&
+			board[i+1][j].state == o {
+			return true, o, board[0][j], board[2][j]
 		}
-		if board[i][j].state == X &&
-			board[i-1][j].state == X &&
-			board[i+1][j].state == X {
-			return true, X, board[0][j], board[2][j]
+		if board[i][j].state == x &&
+			board[i-1][j].state == x &&
+			board[i+1][j].state == x {
+			return true, x, board[0][j], board[2][j]
 		}
 		j--
 	}
@@ -195,15 +195,15 @@ func checkVerticalWin(board [][]square) (bool, string, square, square) {
 			i--
 			continue
 		}
-		if board[i][j].state == O &&
-			board[i][j-1].state == O &&
-			board[i][j+1].state == O {
-			return true, O, board[i][0], board[i][2]
+		if board[i][j].state == o &&
+			board[i][j-1].state == o &&
+			board[i][j+1].state == o {
+			return true, o, board[i][0], board[i][2]
 		}
-		if board[i][j].state == X &&
-			board[i][j-1].state == X &&
-			board[i][j+1].state == X {
-			return true, X, board[i][0], board[i][2]
+		if board[i][j].state == x &&
+			board[i][j-1].state == x &&
+			board[i][j+1].state == x {
+			return true, x, board[i][0], board[i][2]
 		}
 		i--
 	}
@@ -215,25 +215,25 @@ func checkDiagonalWin(board [][]square) (bool, string, square, square) {
 	if board[i][j].state == "" {
 		return false, "", zs, zs
 	}
-	if board[i][j].state == O &&
-		board[i-1][j-1].state == O &&
-		board[i+1][j+1].state == O {
-		return true, O, board[i-1][j-1], board[i+1][j+1]
+	if board[i][j].state == o &&
+		board[i-1][j-1].state == o &&
+		board[i+1][j+1].state == o {
+		return true, o, board[i-1][j-1], board[i+1][j+1]
 	}
-	if board[i][j].state == O &&
-		board[i-1][j+1].state == O &&
-		board[i+1][j-1].state == O {
-		return true, O, board[i-1][j+1], board[i+1][j-1]
+	if board[i][j].state == o &&
+		board[i-1][j+1].state == o &&
+		board[i+1][j-1].state == o {
+		return true, o, board[i-1][j+1], board[i+1][j-1]
 	}
-	if board[i][j].state == X &&
-		board[i-1][j-1].state == X &&
-		board[i+1][j+1].state == X {
-		return true, X, board[i-1][j-1], board[i+1][j+1]
+	if board[i][j].state == x &&
+		board[i-1][j-1].state == x &&
+		board[i+1][j+1].state == x {
+		return true, x, board[i-1][j-1], board[i+1][j+1]
 	}
-	if board[i][j].state == X &&
-		board[i-1][j+1].state == X &&
-		board[i+1][j-1].state == X {
-		return true, X, board[i-1][j+1], board[i+1][j-1]
+	if board[i][j].state == x &&
+		board[i-1][j+1].state == x &&
+		board[i+1][j-1].state == x {
+		return true, x, board[i-1][j+1], board[i+1][j-1]
 	}
 	return false, "", zs, zs
 }
