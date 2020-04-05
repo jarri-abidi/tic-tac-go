@@ -8,4 +8,6 @@ A simple tic-tac-toe game developed using Go and Pixel
 
 To play, simply: ``make run``
 
+Note: ``libgl1-mesa-dev`` and ``xorg-dev`` packages are required to compile this program.
+
 <a href="https://imgbb.com/"><img src="https://i.ibb.co/9v5X7Jx/tictacgo.png" alt="tictacgo" border="0" /></a>
