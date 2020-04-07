@@ -101,11 +101,6 @@ func newGame(imd *imdraw.IMDraw, firstTurn string) [][]square {
 			{center: v(thirdOffset, thirdOffset), corner: v(lineOffset, lineOffset)},
 		},
 	}
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			board[i][j].state = ""
-		}
-	}
 	return board
 }
 
